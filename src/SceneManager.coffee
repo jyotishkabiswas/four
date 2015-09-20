@@ -17,7 +17,8 @@ class SceneManager
             @updateFn = updateFn.bind @
         else
             @updateFn = =>
-        @io.on 'connection', @initializeConnection
+        @io.on 'connection', (socket) =>
+            @initializeConnection socket
 
         @app.get '/', (req, res) ->
             if isMobile req
@@ -26,55 +27,62 @@ class SceneManager
                 res.sendFile path.join(__dirname, '../views/leap.html')
         @app.get '/sceneData', (req, res) =>
             console.log "Sending scene data..."
-            res.send @scene
+            res.send @scene.toJSON()
 
         @animate()
 
     initializeConnection: (socket) ->
         x = Math.floor(Math.random() * (9999 - 1000) + 1000)
-        while x of clients
+        while x of @codeToLeap
             x = Math.floor(Math.random() * (9999 - 1000) + 1000)
 
-        console.log "Client connected!"
-
-        socket.on 'disconnect', ->
-            if socket of @leapClients
-                cbSocket = @leapClients[socket]
+        socket.on 'disconnect', =>
+            if socket of @leapToCardboard
+                cbSocket = @leapToCardboard[socket]
                 cbSocket.send 'error'
-                delete @cardboardClients[cbSocket]
-                delete @leapClients[socket]
+                delete @cardboardToLeap[cbSocket]
+                delete @leapToCardboard[socket]
+            else if @codeToLeap[x]?
+                delete @codeToLeap[x]
             else
+                leap = @cardboardToLeap[x]
+                leap.send 'activate'
+                delete @cardboardtoLeap[socket]
+                delete @leapToCardboard[leap]
 
-        socket.on 'message', (data) ->
-            # leap connection
-            if data.match /leap/
-                @leapClients[x] = socket
-                socket.send "clientId #{x}"
-                return
-            # cardboard connection attempt
-            if data.match /cardboard (\d+)/
-                code = parseInt data.split()[1]
-                unless code of @leapClients
-                    socket.send 'error'
-                leap = @leapClients[code]
-                # create mappings between leap and cardboard
-                @cardboardtoLeap[socket] = @codeToLeap[code]
-                @leapToCardboard[leap] = @cardboardtoLeap[socket]
-                return
-            # object data request
-            x = @scene.getObjectById(parseInt(data), true)
-            if x != null and x != undefined
-                socket.send x
+
+        socket.on 'leap', () =>
+            @codeToLeap[x] = socket
+            socket.send "clientId #{x}"
+            return
+
+        socket.on 'cardboard', (x) =>
+            code = parseInt data.split()[1]
+            unless code of @leapClients
+                socket.send 'error'
+            leap = @leapClients[code]
+            if leap of @leapToCardboard
+                socket.send 'error'
+            # create mappings between leap and cardboard
+            @cardboardtoLeap[socket] = @codeToLeap[code]
+            @leapToCardboard[leap] = @cardboardtoLeap[socket]
+
+        socket.on 'info', (data) =>
+            obj = @scene.getObjectById data.id
+            if obj?
+                @io.emit 'object', obj
 
         # updating hand
-        socket.on 'hand', (leapHand) ->
+        socket.on 'hand', (leapHand) =>
             @playerObjects[socket].head[leapHand.type] = hand
 
         # updating head
-        socket.on 'head', (data) ->
-            @cardboardClients[socket].send data # send head position to correct client
+        socket.on 'head', (data) =>
+            @cardboardToLeap[socket].send data # send head position to correct client
             @playerObjects[socket].head.lookAt = data.lookAt
             @playerObjects[socket].head.up = data.up
+
+        socket.on 'error', (data) =>
 
     add: (object) ->
         @scene.add object

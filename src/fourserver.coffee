@@ -17,9 +17,13 @@ createBoxScene = () ->
 
 updateFn = () ->
     @scene.traverse (node) =>
-        node.rotation.x += 0.01
-        node.rotation.y += 0.01
-        @update node
+        if node.type != "Scene"
+            node.rotation.x += 0.01
+            node.rotation.y += 0.01
+            # console.log node.uuid
+            @update
+                id: node.id
+                rotation: node.rotation
 
 scene = createBoxScene()
 
