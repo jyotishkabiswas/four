@@ -57,11 +57,11 @@ createMesh = (JSON)->
     handMesh.screenPosition = (position)->
 
         camera = scope.camera
-        console.assert(camera instanceof THREE.Camera, "screenPosition expects camera, got", camera);
+        console.assert(camera instanceof THREE.Camera, "screenPosition expects camera, got", camera)
 
         width =    parseInt(window.getComputedStyle(scope.renderer.domElement).width,    10)
         height = parseInt(window.getComputedStyle(scope.renderer.domElement).height, 10)
-        console.assert(width && height);
+        console.assert(width && height)
 
         screenPosition = new THREE.Vector3()
 

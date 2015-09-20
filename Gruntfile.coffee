@@ -32,11 +32,15 @@ module.exports = (grunt) ->
         coffee:
             compile:
                 files:
-                    'public/scripts/four-cardboard.js':
+                    'public/scripts/four-cardboard.js': [
                         'client/MeshHand.coffee'
                         'client/cardboard/**/*.coffee'
-                    'public/scripts/four-leap.js':
+                    ]
+                    'public/scripts/four-leap.js': [
                         'client/leap/**/*.coffee'
+                    ]
+                options:
+                    bare: true
 
         uglify:
             public:
@@ -53,9 +57,9 @@ module.exports = (grunt) ->
             client:
                 files: ['<%= dirs.client %>/**/*.coffee']
                 tasks: ['coffeelint', 'coffee', 'uglify']
-
-        clean:
-            scripts: ['<%= dirs.scripts %>']
+            server:
+                files: ['<%= dirs.src %>/**/*.coffee']
+                tasks: ['nodemon', 'notify:serve']
 
         nodemon:
             dev:
@@ -69,7 +73,6 @@ module.exports = (grunt) ->
 
 
     grunt.registerTask 'build', [
-        'clean'
         'coffeelint'
         'coffee'
         'uglify'
