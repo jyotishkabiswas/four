@@ -57,23 +57,17 @@ LeapClient = (function() {
     })(this));
     this.io.on('update', (function(_this) {
       return function(object) {
-        var old, prop, results;
+        var old, pos, rot;
         old = _this.objects[object.id];
         if (old == null) {
           return _this.io.emit('info', {
             id: object.id
           });
         } else {
-          results = [];
-          for (prop in object) {
-            console.log(prop);
-            if (prop !== 'id') {
-              results.push(old[prop] = object[prop]);
-            } else {
-              results.push(void 0);
-            }
-          }
-          return results;
+          pos = object.position;
+          rot = object.rotation;
+          old.rotation.set(rot.x, rot.y, rot.z, rot.order);
+          return old.position.set(pos.x, pos.y, pos.z);
         }
       };
     })(this));

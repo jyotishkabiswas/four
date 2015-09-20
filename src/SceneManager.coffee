@@ -64,6 +64,7 @@ class SceneManager
             if leap of @leapToCardboard
                 socket.send 'error'
             # create mappings between leap and cardboard
+            leap.send 'deactivate'
             @cardboardtoLeap[socket] = @codeToLeap[code]
             @leapToCardboard[leap] = @cardboardtoLeap[socket]
 
@@ -87,7 +88,7 @@ class SceneManager
 
     add: (object) ->
         @scene.add object
-        object.userData.id = object.id
+        object.userData.id = object.id # hack for synchronization
         @io.emit 'add', object
 
     remove: (object) ->

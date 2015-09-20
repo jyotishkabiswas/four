@@ -49,22 +49,16 @@ class LeapClient
             unless old?
                 @io.emit 'info', {id: object.id}
             else
-                for prop of object
-                    old[prop] = object[prop] if prop != 'id'
+                pos = object.position
+                rot = object.rotation
+                old.rotation.set rot.x, rot.y, rot.z, rot.order
+                old.position.set pos.x, pos.y, pos.z
 
         @io.on 'object', (object) =>
             unless @objects[object.object.userData.id]?
                 loader.parse object, (obj3D) =>
                     @objects[object.object.userData.id] = obj3D
                     @scene.add obj3D
-
-        # $.ajax "/sceneData",
-        #     type: 'GET'
-        #     contentType: 'application/json; charset=UTF-8'
-        #     data: null
-        #     success: (response) =>
-        #         loader = new THREE.ObjectLoader()
-        #         loader.parse response, (scene) =>
 
         options = enableGestures: true
         controller = new Leap.Controller()
