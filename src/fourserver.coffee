@@ -54,37 +54,28 @@ class Table
 
 
 
-        if newPos.x > @w/2
+        # if newPos.x > @w/2
 
-        else if newPos.x < -@w/2
+        # else if newPos.x < -@w/2
 
-        else if newPos.z > @d/2
+        # else if newPos.z > @d/2
 
-        else if newPos.z < -@d/2
+        # else if newPos.z < -@d/2
 
         if @puck.velocity > 0.0001
             @puck.velocity *= (1- 0.01 * @puck.velocity)
 
 
-
-
-class Peg
-
-    constructor: (radius) ->
-
 createAirHockeyScene = () ->
     scene = new THREE.Scene()
-    sm = new SceneManager app, io, scene, updateFn
+    table = new Table(10.0, 14.0, 1, 1.3, scene)
+    sm = new SceneManager app, io, scene, () ->
+        table.update()
     # table = new THREE.Mesh(new THREE.BoxGeometry(10, 15, 1), new THREE.MeshPhongMaterial({ color: 0x888888 }))
-    scene.add table
-    box.userData.id = box.id
-    scene
-
-updateFn = () ->
-
-scene = createBoxScene()
+    sm
 
 port = process.env.PORT || 3000
 server.listen port
 
-module.exports = new SceneManager app, io, scene, updateFn
+module.exports = createAirHockeyScene()
+

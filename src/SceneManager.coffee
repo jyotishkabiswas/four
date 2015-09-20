@@ -51,9 +51,11 @@ class SceneManager
                 delete @leapToCardboard[leap]
                 delete @cardboardtoLeap[socket]
 
-
-
         socket.on 'leap', () =>
+            if @playerObjects.length > 1
+                return
+            else if @playerObjects.length == 1
+                @playerObjects.push new Head(new THREE.Vector3(0, 4, -13))
             @codeToLeap[x] = socket
             socket.send "clientId #{x}"
             return

@@ -12,10 +12,8 @@ class CardboardClient
         @active = true
         @objects = {}
         @pin = -1
-        @handAdapter = new HandAdapter @
-        adapter
+        @controller = false
 
-        loader = new THREE.ObjectLoader()
 
         @renderer.setSize window.innerWidth, window.innerHeight
         document.body.appendChild @renderer.domElement
@@ -25,15 +23,17 @@ class CardboardClient
 
     setCallbacks: () ->
 
+        loader = new THREE.ObjectLoader()
+
         @io.on 'connect', =>
             @io.emit 'cardboard', @pin
+            @controller = true
 
         @io.on 'message', (data) =>
             if data == 'error'
+                @controller = false
                 @io.disconnect()
                 $(".clientId").show()
-            else # hand
-                @handAdapter.frameAction JSON.parse(data)
 
         @io.on 'add', (object) =>
             loader.parse object, (obj3D) =>
@@ -67,10 +67,16 @@ class CardboardClient
         effect.setSize( window.innerWidth, window.innerHeight )
 
         sense = window.sense.init()
-        sense.orientation (data) ->
-            @camera.rotation.y = 90.0 - gamma
-            @camera.rotation.x = beta
-            @camera.rotation.z = alpha
+        sense.orientation (data) =>
+            if @controller
+                @camera.rotation.y = 90.0 - gamma
+                @camera.rotation.x = beta
+                @camera.rotation.z = alpha
+                @io.emit 'head', {
+                    x: rotation.x
+                    y: rotation.y
+                    z: rotation.z
+                }
 
         @animate()
 
