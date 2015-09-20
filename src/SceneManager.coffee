@@ -11,7 +11,8 @@ class SceneManager
         @codeToLeap = {}
         @cardboardToLeap = {}
         @leapToCardboard = {}
-        @playerObjects = {}
+        @playerObjects = []
+
         @scene = @scene || new Physi.Scene()
         if updateFn?
             @updateFn = updateFn.bind @

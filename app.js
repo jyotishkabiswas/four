@@ -1,2 +1,2 @@
 require("coffee-script/register");
-module.exports = require('./src/fourserver');
+module.exports = require('./src/FourServer');
