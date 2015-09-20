@@ -7,13 +7,15 @@
     <title>Four</title>
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <script type="text/javascript" src="scripts/vendor/jquery-1.11.3.min.js"></script>
-    <script type="text/javascript" src="//js.leapmotion.com/leap-0.6.4.min.js"></script>
-    <script type="text/javascript" src="scripts/vendor/socket.io.js"></script>
     <script type="text/javascript" src="scripts/vendor/three.min.js"></script>
+    <script type="text/javascript" src="//js.leapmotion.com/leap-0.6.4.min.js"></script>
+    <script src="//js.leapmotion.com/leap-plugins-0.1.11.min.js"></script>
+    <script type="text/javascript" src="scripts/vendor/leap.rigged-hand-0.1.7.min.js"></script>
+    <script type="text/javascript" src="scripts/vendor/socket.io.js"></script>
     <script type="text/javascript" src="scripts/four-leap.js"></script>
     <script type="text/javascript">
         $(function () {
-            var four = new Four.LeapClient('http://localhost');
+            var four = new Four.LeapClient();
         });
     </script>
 </head>

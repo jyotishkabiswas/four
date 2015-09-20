@@ -47,8 +47,9 @@ class SceneManager
             else
                 leap = @cardboardToLeap[x]
                 leap.send 'activate'
-                delete @cardboardtoLeap[socket]
                 delete @leapToCardboard[leap]
+                delete @cardboardtoLeap[socket]
+
 
 
         socket.on 'leap', () =>

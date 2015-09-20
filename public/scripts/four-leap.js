@@ -3,9 +3,8 @@ var Four, LeapClient;
 Four = {};
 
 LeapClient = (function() {
-  function LeapClient(url) {
-    var controller, loader, options;
-    this.url = url;
+  function LeapClient() {
+    var controller, loader;
     this.renderer = new THREE.WebGLRenderer() || new THREE.CanvasRenderer();
     this.clientId = null;
     this.scene = new THREE.Scene();
@@ -81,33 +80,41 @@ LeapClient = (function() {
         }
       };
     })(this));
-    options = {
-      enableGestures: true
-    };
     controller = new Leap.Controller();
     controller.setOptimizeHMD();
-    Leap.loop(options, (function(_this) {
+    controller.use('handHold', {}).use('handEntry', {}).use('riggedHand', {
+      parent: this.scene,
+      renderFn: (function(_this) {
+        return function() {
+          return _this.renderer.render(_this.scene, _this.camera);
+        };
+      })(this)
+    }).connect();
+    controller.on('frame', (function(_this) {
       return function(frame) {
         var hand, i, len, ref, results;
         ref = frame.hands;
         results = [];
         for (i = 0, len = ref.length; i < len; i++) {
           hand = ref[i];
-          results.push(_this.io.emit('hand', hand));
+          results.push(_this.io.emit('hand', {
+            direction: hand.direction,
+            velocity: hand.palmVelocity,
+            position: hand.palmPosition,
+            normal: hand.palmNormal
+          }));
         }
         return results;
       };
     })(this));
-    this.animate();
   }
 
   LeapClient.prototype.animate = function() {
-    requestAnimationFrame((function(_this) {
+    return requestAnimationFrame((function(_this) {
       return function() {
         return _this.animate();
       };
     })(this));
-    return this.renderer.render(this.scene, this.camera);
   };
 
   return LeapClient;

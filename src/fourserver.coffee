@@ -6,7 +6,6 @@ io = require('socket.io')(server)
 
 THREE = require 'three'
 
-routes = require './routes/index'
 SceneManager = require './SceneManager'
 
 createBoxScene = () ->

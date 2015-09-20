@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Four</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script type="text/javascript" src="scripts/vendor/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="scripts/vendor/socket.io.js"></script>
+    <script type="text/javascript" src="scripts/vendor/sense.js"></script>
+    <script type="text/javascript" src="scripts/vendor/three.min.js"></script>
+    <script type="text/javascript" src="scripts/vendor/StereoEffect.js"></script>
+    <script type="text/javascript" src="scripts/vendor/hand_models_v1.js"></script>
+    <script type="text/javascript" src="scripts/vendor/left_hand_terrence_3.js"></script>
+    <script type="text/javascript" src="scripts/four-cardboard.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var four = new Four.CardboardClient();
+        });
+    </script>
+</head>
+
+<body>
+<div class="ClientId">
+ClientId: <span id="pin"></span><br>
+<input type="text" id="pinInput" placeholder="pin"></input>
+<button onclick="four.setPinAndConnect();">Enter</button>
+</div>
+</body>
+
+</html>

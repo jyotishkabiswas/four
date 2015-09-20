@@ -2,7 +2,7 @@ Four = {}
 
 class LeapClient
 
-    constructor: (@url) ->
+    constructor: () ->
 
         @renderer = new THREE.WebGLRenderer() || new THREE.CanvasRenderer()
         @clientId = null
@@ -60,17 +60,26 @@ class LeapClient
                     @objects[object.object.userData.id] = obj3D
                     @scene.add obj3D
 
-        options = enableGestures: true
         controller = new Leap.Controller()
         controller.setOptimizeHMD()
-        Leap.loop options, (frame) =>
+        controller.use 'handHold', {}
+        .use 'handEntry', {}
+        .use 'riggedHand',
+            parent: @scene
+            renderFn: () =>
+                @renderer.render @scene, @camera
+        .connect()
+        controller.on 'frame', (frame) =>
             for hand in frame.hands
-                @io.emit 'hand', hand
-        @animate()
+                @io.emit 'hand',
+                    direction: hand.direction
+                    velocity: hand.palmVelocity
+                    position: hand.palmPosition
+                    normal: hand.palmNormal
+
 
     animate: ->
         requestAnimationFrame () =>
             @animate()
-        @renderer.render @scene, @camera
 
 Four.LeapClient = LeapClient
