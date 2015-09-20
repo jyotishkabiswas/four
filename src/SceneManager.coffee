@@ -68,7 +68,8 @@ class SceneManager
             @leapToCardboard[leap] = @cardboardtoLeap[socket]
 
         socket.on 'info', (data) =>
-            obj = @scene.getObjectById data.id
+            obj = @scene.getObjectById(data.id)
+            obj.userData.id = obj.id
             if obj?
                 @io.emit 'object', obj
 
@@ -86,11 +87,15 @@ class SceneManager
 
     add: (object) ->
         @scene.add object
+        object.userData.id = object.id
         @io.emit 'add', object
 
     remove: (object) ->
         @scene.remove object
-        @io.emit 'remove', object
+        id = object.id
+        object = object.toJSON()
+        object.id = object.id
+        @io.emit 'remove', object.id
 
     # to be called whenever an object is mutated
     update: (object) ->

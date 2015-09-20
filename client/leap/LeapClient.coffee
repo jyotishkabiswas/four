@@ -37,25 +37,25 @@ class LeapClient
         @io.on 'add', (object) =>
             loader.parse object, (obj3D) =>
                 @scene.add obj3D
-                @objects[object.uuid] = obj3D
+                @objects[object.object.userData.id] = obj3D
 
-        @io.on 'remove', (uuid) =>
-            toRemove = @objects[uuid]
+        @io.on 'remove', (id) =>
+            toRemove = @objects[id]
             @scene.remove toRemove
-            delete @objects[uuid]
+            delete @objects[id]
 
         @io.on 'update', (object) =>
-            old = @objects[object.uuid]
+            old = @objects[object.id]
             unless old?
                 @io.emit 'info', {id: object.id}
             else
-                for prop of object.props
+                for prop of object
                     old[prop] = object[prop] if prop != 'id'
 
         @io.on 'object', (object) =>
-            unless @objects[object.uuid]?
+            unless @objects[object.object.userData.id]?
                 loader.parse object, (obj3D) =>
-                    @objects[object.uuid] = obj3D
+                    @objects[object.object.userData.id] = obj3D
                     @scene.add obj3D
 
         # $.ajax "/sceneData",
@@ -66,8 +66,12 @@ class LeapClient
         #         loader = new THREE.ObjectLoader()
         #         loader.parse response, (scene) =>
 
-
-
+        options = enableGestures: true
+        controller = new Leap.Controller()
+        controller.setOptimizeHMD()
+        Leap.loop options, (frame) =>
+            for hand in frame.hands
+                @io.emit 'hand', hand
         @animate()
 
     animate: ->

@@ -4,7 +4,7 @@ Four = {};
 
 LeapClient = (function() {
   function LeapClient(url) {
-    var loader;
+    var controller, loader, options;
     this.url = url;
     this.renderer = new THREE.WebGLRenderer() || new THREE.CanvasRenderer();
     this.clientId = null;
@@ -43,29 +43,30 @@ LeapClient = (function() {
       return function(object) {
         return loader.parse(object, function(obj3D) {
           _this.scene.add(obj3D);
-          return _this.objects[object.uuid] = obj3D;
+          return _this.objects[object.object.userData.id] = obj3D;
         });
       };
     })(this));
     this.io.on('remove', (function(_this) {
-      return function(uuid) {
+      return function(id) {
         var toRemove;
-        toRemove = _this.objects[uuid];
+        toRemove = _this.objects[id];
         _this.scene.remove(toRemove);
-        return delete _this.objects[uuid];
+        return delete _this.objects[id];
       };
     })(this));
     this.io.on('update', (function(_this) {
       return function(object) {
         var old, prop, results;
-        old = _this.objects[object.uuid];
+        old = _this.objects[object.id];
         if (old == null) {
           return _this.io.emit('info', {
             id: object.id
           });
         } else {
           results = [];
-          for (prop in object.props) {
+          for (prop in object) {
+            console.log(prop);
             if (prop !== 'id') {
               results.push(old[prop] = object[prop]);
             } else {
@@ -78,13 +79,29 @@ LeapClient = (function() {
     })(this));
     this.io.on('object', (function(_this) {
       return function(object) {
-        console.log(object.uuid);
-        if (_this.objects[object.uuid] == null) {
+        if (_this.objects[object.object.userData.id] == null) {
           return loader.parse(object, function(obj3D) {
-            _this.objects[object.uuid] = obj3D;
+            _this.objects[object.object.userData.id] = obj3D;
             return _this.scene.add(obj3D);
           });
         }
+      };
+    })(this));
+    options = {
+      enableGestures: true
+    };
+    controller = new Leap.Controller();
+    controller.setOptimizeHMD();
+    Leap.loop(options, (function(_this) {
+      return function(frame) {
+        var hand, i, len, ref, results;
+        ref = frame.hands;
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          hand = ref[i];
+          results.push(_this.io.emit('hand', hand));
+        }
+        return results;
       };
     })(this));
     this.animate();
