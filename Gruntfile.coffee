@@ -32,8 +32,11 @@ module.exports = (grunt) ->
         coffee:
             compile:
                 files:
-                    'public/scripts/four-cardboard.js': 'client/cardboard/**/*.coffee'
-                    'public/scripts/four-leap.js': 'client/leap/**/*.coffee'
+                    'public/scripts/four-cardboard.js':
+                        'client/MeshHand.coffee'
+                        'client/cardboard/**/*.coffee'
+                    'public/scripts/four-leap.js':
+                        'client/leap/**/*.coffee'
 
         uglify:
             public:
